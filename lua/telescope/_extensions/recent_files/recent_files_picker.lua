@@ -119,7 +119,7 @@ local function add_recent_file(result_list, result_map, file_path, opts)
   if should_add and not is_in_cwd(file_path) then
     should_add = false
   end
-  should_add = false
+
   if should_add then
     table.insert(result_list, file_path)
     result_map[file_path] = true
