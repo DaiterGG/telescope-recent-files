@@ -56,7 +56,7 @@ augroup END
 ]]
 
 local function stat(filename)
-  local s = vim.loop.fs_stat(filename)
+  local s = vim.uv.fs_stat(filename)
   if not s then
     return nil
   end
@@ -83,7 +83,7 @@ local function normalize(path)
 end
 
 local function is_in_cwd(file_path)
-  local cwd                          = vim.loop.cwd()
+  local cwd                          = vim.uv.cwd()
   local parent_path                  = normalize(cwd)
   local child_path                   = normalize(file_path)
 
