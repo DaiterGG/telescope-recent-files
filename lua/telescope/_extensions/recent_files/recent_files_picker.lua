@@ -85,7 +85,6 @@ end
 local function is_in_cwd(file_path)
   -- Get absolute, resolved path of current working directory
   local cwd = vim.uv.cwd()
-  if not cwd then return false end
   local resolved_cwd = vim.uv.fs_realpath(cwd) or cwd
 
   -- Resolve the file path (follow symlinks, get absolute)
