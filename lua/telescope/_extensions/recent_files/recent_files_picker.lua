@@ -83,15 +83,25 @@ local function normalize(path)
 end
 
 local function is_in_cwd(file_path)
-  local cwd                          = vim.uv.cwd()
-  local parent_path                  = normalize(cwd)
-  local child_path                   = normalize(file_path)
+  -- Get absolute, resolved path of current working directory
+  local cwd = vim.uv.cwd()
+  if not cwd then return false end
+  local resolved_cwd = vim.uv.fs_realpath(cwd) or cwd
 
-  local is_parent_prefix             = child_path:sub(1, #parent_path) == parent_path
-  local is_direct_child_or_same_path = child_path:sub(#parent_path + 1, #parent_path + 1) == '/' or
-      child_path:sub(#parent_path + 1, #parent_path + 1) == ''
+  -- Resolve the file path (follow symlinks, get absolute)
+  local resolved_file = vim.uv.fs_realpath(file_path)
+  if not resolved_file then
+    -- If resolution fails (e.g., file doesn't exist), fall back to absolute path
+    resolved_file = vim.fn.fnamemodify(file_path, ':p')
+  end
 
-  return is_parent_prefix and is_direct_child_or_same_path
+  resolved_cwd = resolved_cwd:gsub('\\', '/'):gsub('/$', '')
+  resolved_file = resolved_file:gsub('\\', '/'):gsub('/$', '')
+
+  -- Check if resolved_file is inside resolved_cwd
+  return resolved_file:sub(1, #resolved_cwd) == resolved_cwd
+      and (#resolved_file == #resolved_cwd
+          or resolved_file:sub(#resolved_cwd + 1, #resolved_cwd + 1) == '/')
 end
 
 local function add_recent_file(result_list, result_map, file_path, opts)
